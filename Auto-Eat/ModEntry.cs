@@ -56,7 +56,7 @@ namespace AutoEat
             goodPreviousFrame = false;
             eatingFood = false; 
         }
-
+        
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
             // get Generic Mod Config Menu's API (if it's installed)
@@ -155,21 +155,24 @@ namespace AutoEat
 
             return threshold;
         }
-
+        
+        private bool IsUnbreakFisking()
+        {
+            return Game1.player.CurrentTool is FishingRod rod && (rod.isFishing || rod.isNibbling || rod.isReeling ||
+                                                                  rod.pullingOutOfWater || rod.fishCaught ||
+                                                                  rod.showingTreasure);
+        }
+        
         /// <summary>Raised after the game state is updated (≈60 times per second).</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event data.</param>
         private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsPlayerFree)
+            if (!Context.IsPlayerFree || IsUnbreakFisking())
             {
                 return;
             }
-
-            if (Game1.player.CurrentTool is FishingRod rod && (rod.isReeling || rod.isFishing || rod.pullingOutOfWater))  // do not break fishing
-            {
-                return;
-            }
+            
             EatForStamina(sender, e);
             EatForBuff(sender, e);
         }
@@ -228,12 +231,16 @@ namespace AutoEat
         {
             Game1.showGlobalMessage($"You consume {food.Name} {reason}."); //makes a message to inform the player of the reason they just stopped what they were doing to be forced to eat a food, lol.
             var direction = Game1.player.FacingDirection;
+            var toolIndex = Game1.player.CurrentToolIndex;
+            if (Game1.player.CurrentTool is FishingRod tool && tool.inUse())
+                tool.resetState();
             Game1.player.eatObject((StardewValley.Object)food); //cast the cheapestFood Item to be an Object since playerEatObject only accepts Objects, finally allowing the player to eat the cheapest food they have on them.
-            Game1.player.FacingDirection = direction;
             //Game1.playerEatObject((StardewValley.Object)cheapestFood); //<== pre-multiplayer beta version of above line of code.
             food.Stack--; //stack being the amount of the cheapestFood that the player has on them, we have to manually decrement this apparently, as playerEatObject does not do this itself for some reason.
             if (food.Stack == 0) //if the stack has hit the number 0, then
                 Game1.player.removeItemFromInventory(food); //delete the item from the player's inventory..I don't want to know what would happen if they tried to use it when it was at 0!
+            Game1.player.FacingDirection = direction;
+            Game1.player.CurrentToolIndex = toolIndex;
         }
 
         private void EatForBuff(object sender, UpdateTickedEventArgs e)
@@ -242,7 +249,7 @@ namespace AutoEat
             {
                 return;
             }
-            if (Game1.player.isEating)
+            if (Game1.player.isEating || eatingFood)
             {
                 return;
             }
