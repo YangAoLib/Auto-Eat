@@ -165,6 +165,11 @@ namespace AutoEat
             {
                 return;
             }
+
+            if (Game1.player.CurrentTool is FishingRod rod && (rod.isReeling || rod.isFishing || rod.pullingOutOfWater))  // do not break fishing
+            {
+                return;
+            }
             EatForStamina(sender, e);
             EatForBuff(sender, e);
         }
