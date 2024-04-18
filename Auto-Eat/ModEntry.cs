@@ -156,7 +156,7 @@ namespace AutoEat
             return threshold;
         }
         
-        private bool IsUnbreakFisking()
+        private static bool IsUnBreakFishing()
         {
             return Game1.player.CurrentTool is FishingRod rod && (rod.isFishing || rod.isNibbling || rod.isReeling ||
                                                                   rod.pullingOutOfWater || rod.fishCaught ||
@@ -168,7 +168,7 @@ namespace AutoEat
         /// <param name="e">The event data.</param>
         private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsPlayerFree || IsUnbreakFisking())
+            if (!Context.IsPlayerFree || IsUnBreakFishing())
             {
                 return;
             }
