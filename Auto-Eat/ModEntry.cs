@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GenericModConfigMenu;
 using StardewModdingAPI;
@@ -19,6 +20,7 @@ namespace AutoEat
         private static bool newDay = true; //only true at 6:00 am in-game
         private static bool goodPreviousFrame = false; //used to prevent loss of food when falling to 0 Stamina on the same frame that you receive a Lost Book or something similar, in that order.
         private static bool eatingFood = false; //just a boolean used to make it so that code doesn't run more than once.
+        private static Dictionary<string, long> lastEatTime = new Dictionary<string, long>();
 
         public static bool firstCall = false; //used in clearOldestHUDMessage()
         public static ModConfig Config;
@@ -55,6 +57,7 @@ namespace AutoEat
             trueOverexertion = false;
             goodPreviousFrame = false;
             eatingFood = false; 
+            lastEatTime.Clear();
         }
         
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -120,6 +123,13 @@ namespace AutoEat
                 tooltip: () => "Drink coffee or Triple Shot Espresso when the buff is gone.",
                 getValue: () => Config.EnableCoffee,
                 setValue: value => Config.EnableCoffee = value
+            );
+            configMenu.AddTextOption(
+                mod: this.ModManifest,
+                name: () => "Auto eat custom foods",
+                tooltip: () => "Auto eat custom foods when the buff is gone, food names are separated by commas.",
+                getValue: () => Config.CustomFoods,
+                setValue: value => Config.CustomFoods = value
             );
         }
 
@@ -243,35 +253,96 @@ namespace AutoEat
             Game1.player.CurrentToolIndex = toolIndex;
         }
 
-        private void EatForBuff(object sender, UpdateTickedEventArgs e)
+        private string TryEatCoffee(Dictionary<string, Buff> buffs, Dictionary<string, Item> items, long now)
         {
             if (!Config.EnableCoffee)
             {
-                return;
+                return "";
             }
-            if (Game1.player.isEating || eatingFood)
+            Buff buff;
+            if (!buffs.TryGetValue("Triple Shot Espresso", out buff))
             {
-                return;
+                buffs.TryGetValue("Coffee", out buff);
             }
-            var buff = Game1.buffsDisplay.GetSortedBuffs()
-                .FirstOrDefault(obj => (obj.source == "Triple Shot Espresso" || obj.source == "Coffee"));
             if (buff != null && buff.millisecondsDuration > 1000)
             {
+                return "";
+            }
+            Item coffee;
+            if (!items.TryGetValue("Coffee", out coffee) && !items.TryGetValue("Triple Shot Espresso", out coffee))
+            {
+                return "";
+            }
+
+            buff = coffee.GetFoodOrDrinkBuffs().First();
+            if (buff != null && now - lastEatTime.GetValueOrDefault(coffee.Name, 0) < buff.totalMillisecondsDuration/1000-1)
+            {
+                return "";
+            }
+            EatFood(coffee, $"for buff");
+            this.Monitor.Log($"Auto-Eat: {coffee.Name} left {coffee.Stack} {lastEatTime.GetValueOrDefault(coffee.Name, 0)}");
+            return coffee.Name;
+        }
+
+        private void EatForBuff(object sender, UpdateTickedEventArgs e)
+        {
+            if (Config._customFoods.Count == 0 && !Config.EnableCoffee)
+            {
                 return;
             }
-            var coffee = Game1.player.Items
-                .FirstOrDefault(curItem =>
-                {
-                    if ((curItem is StardewValley.Object obj))
-                    {
-                        return (obj.Edibility > 0 && (obj.Name == "Triple Shot Espresso" || obj.Name == "Coffee"));
-                    }
-                    return false;
-                });
-            if (coffee != null)
+            if (Game1.ticks % 10 != 0 || Game1.player.isEating || eatingFood || (Game1.player.CurrentTool is FishingRod && Game1.player.UsingTool))
             {
-                EatFood(coffee, "for buff");
-                this.Monitor.Log($"Auto-Eat: {coffee.Name} left {coffee.Stack}");
+                return;
+            }
+
+            var now = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var buffs = new Dictionary<string, Buff>();
+            foreach (var b in Game1.buffsDisplay.GetSortedBuffs())
+            {
+                if (b.source != null)
+                {
+                    buffs[b.source] = b; 
+                }
+            }
+            var items = new Dictionary<string, Item>();
+            foreach (var i in Game1.player.Items)
+            {
+                if (i is StardewValley.Object obj && obj.Edibility > 0 && obj.GetFoodOrDrinkBuffs().Any())
+                {
+                    items[obj.Name] = obj;
+                }
+            }
+
+            var name0 = TryEatCoffee(buffs, items, now);
+            if (name0.Length > 0)
+            {
+                lastEatTime[name0] = now;
+                return;
+            }
+
+            foreach (var name in Config._customFoods)
+            {
+                Buff buff;
+                if (buffs.TryGetValue(name, out buff) && buff.millisecondsDuration > 1000)
+                {
+                    continue;
+                }
+                
+                Item food;
+                if (!items.TryGetValue(name, out food))
+                {
+                    continue;
+                }
+                
+                buff = food.GetFoodOrDrinkBuffs().First();
+                if (buff != null && now - lastEatTime.GetValueOrDefault(name, 0) < buff.totalMillisecondsDuration/1000-1)
+                {
+                    continue;
+                }
+                EatFood(food, $"for buff");
+                this.Monitor.Log($"Auto-Eat: {food.Name} left {food.Stack} {lastEatTime.GetValueOrDefault(food.Name, 0)}");
+                lastEatTime[food.Name] = now;
+                return;
             }
         }
 
