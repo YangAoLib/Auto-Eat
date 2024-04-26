@@ -251,6 +251,7 @@ namespace AutoEat
                 Game1.player.removeItemFromInventory(food); //delete the item from the player's inventory..I don't want to know what would happen if they tried to use it when it was at 0!
             Game1.player.FacingDirection = direction;
             Game1.player.CurrentToolIndex = toolIndex;
+            this.Monitor.Log($"Auto-Eat: {food.Name} left: {food.Stack} last:{lastEatTime.GetValueOrDefault(food.Name, 0)}");
         }
 
         private string TryEatCoffee(Dictionary<string, Buff> buffs, Dictionary<string, Item> items, long now)
@@ -280,7 +281,6 @@ namespace AutoEat
                 return "";
             }
             EatFood(coffee, $"for buff");
-            this.Monitor.Log($"Auto-Eat: {coffee.Name} left {coffee.Stack} {lastEatTime.GetValueOrDefault(coffee.Name, 0)}");
             return coffee.Name;
         }
 
@@ -340,7 +340,6 @@ namespace AutoEat
                     continue;
                 }
                 EatFood(food, $"for buff");
-                this.Monitor.Log($"Auto-Eat: {food.Name} left {food.Stack} {lastEatTime.GetValueOrDefault(food.Name, 0)}");
                 lastEatTime[food.Name] = now;
                 return;
             }
@@ -380,6 +379,7 @@ namespace AutoEat
             newDay = false; //reset the variable, allowing the UpdateTick method checks to occur once more
             trueOverexertion = false; //reset the variable, allowing the UpdateTick method checks to occur once more (in other words, allowing the player to avoid over-exertion once more)
             eatingFood = false; //reset the variable (this one isn't necessary as far as I know, but who knows? maybe a person will run out of stamina right as they hit 2:00 am in-game.)
+            lastEatTime.Clear();
         }
     }
 }

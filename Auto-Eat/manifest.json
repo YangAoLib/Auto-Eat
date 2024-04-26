@@ -1,11 +1,11 @@
 {
   "Name": "Auto-Eat",
   "Author": "Permamiss",
-  "Version": "2.3.0",
+  "Version": "2.3.1",
   "Description": "Eat food automatically upon running out of stamina or health.",
   "UniqueID": "Permamiss.AutoEat",
   "EntryDll": "Auto-Eat.dll",
   "MinimumApiVersion": "4.0.0",
   "MinimumGameVersion": "1.6.3",
-  "UpdateKeys": [ "Nexus:643" ]
+  "UpdateKeys": [ "Nexus:643", "GitHub:ruanimal/Auto-Eat" ]
 }
