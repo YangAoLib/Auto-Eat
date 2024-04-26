@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using GenericModConfigMenu;
+using Microsoft.VisualBasic;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -77,57 +79,57 @@ namespace AutoEat
             // add some config options
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Enable for stamina",
-                tooltip: () => "Enable automatically consume food for stamina.",
+                name: () => Helper.Translation.Get("EnableStamina.name"),
+                tooltip: () => Helper.Translation.Get("EnableStamina.tooltip"),
                 getValue: () => Config.EnableStamina,
                 setValue: value => Config.EnableStamina = value
             );
             configMenu.AddNumberOption(
                 mod: this.ModManifest,
-                name: () => "Stamina threshold",
-                tooltip: () => "Stamina threshold at which the player will automatically consume food.",
+                name: () => Helper.Translation.Get("StaminaThreshold.name"),
+                tooltip: () => Helper.Translation.Get("StaminaThreshold.tooltip"),
                 getValue: () => Config.StaminaThreshold,
                 setValue: value => Config.StaminaThreshold = Math.Max(value, 0f)
             );
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Dynamic stamina threshold",
-                tooltip: () => "Use dynamic stamina threshold depending on current tool costs.",
+                name: () => Helper.Translation.Get("DynamicStaminaThreshold.name"),
+                tooltip: () => Helper.Translation.Get("DynamicStaminaThreshold.tooltip"),
                 getValue: () => Config.DynamicStaminaThreshold,
                 setValue: value => Config.DynamicStaminaThreshold = value
             );
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Enable for health",
-                tooltip: () => "Enable automatically consume food for health.",
+                name: () => Helper.Translation.Get("EnableHealth.name"),
+                tooltip: () => Helper.Translation.Get("EnableHealth.tooltip"),
                 getValue: () => Config.EnableHealth,
                 setValue: value => Config.EnableHealth = value
             );
             configMenu.AddNumberOption(
                 mod: this.ModManifest,
-                name: () => "Health threshold",
-                tooltip: () => "Health threshold at which the player will automatically consume food.",
+                name: () => Helper.Translation.Get("HealthThreshold.name"),
+                tooltip: () => Helper.Translation.Get("HealthThreshold.tooltip"),
                 getValue: () => Config.HealthThreshold,
                 setValue: value => Config.HealthThreshold = Math.Max(value, 0f)
             );
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Prefer higher inventory food",
-                tooltip: () => "Among equally cheap (salePrice / Energy) foods, prefer foods with higher inventory.",
+                name: () => Helper.Translation.Get("PreferHigherInventory.name"),
+                tooltip: () => Helper.Translation.Get("PreferHigherInventory.tooltip"),
                 getValue: () => Config.PreferHigherInventory,
                 setValue: value => Config.PreferHigherInventory = value
             );
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Auto drink coffee",
-                tooltip: () => "Drink coffee or Triple Shot Espresso when the buff is gone.",
+                name: () => Helper.Translation.Get("EnableCoffee.name"),
+                tooltip: () => Helper.Translation.Get("EnableCoffee.tooltip"),
                 getValue: () => Config.EnableCoffee,
                 setValue: value => Config.EnableCoffee = value
             );
             configMenu.AddTextOption(
                 mod: this.ModManifest,
-                name: () => "Auto eat custom foods",
-                tooltip: () => "Auto eat custom foods when the buff is gone, food names are separated by commas.",
+                name: () => Helper.Translation.Get("CustomFoods.name"),
+                tooltip: () => Helper.Translation.Get("CustomFoods.tooltip"),
                 getValue: () => Config.CustomFoods,
                 setValue: value => Config.CustomFoods = value
             );
@@ -199,12 +201,23 @@ namespace AutoEat
                 goodPreviousFrame = false;
                 return;
             }
-
+            
             var staminaThreshold = Config.DynamicStaminaThreshold ? GetDynamicStaminaThreshold() : Config.StaminaThreshold;
+            int eatType;
+            if (Config.EnableStamina && (Game1.player.Stamina <= staminaThreshold))
+            {
+                eatType = 1;
+            }
+            else if (Config.EnableHealth && (Game1.player.health <= Config.HealthThreshold))
+            {
+                eatType = 2;
+            }
+            else
+            {
+                eatType = 0;
+            }
             //if already eating food, then ignore the rest of the method in order to prevent unnecessary loop
-            var needEat = (!eatingFood && !Game1.player.isEating) && (
-                (Config.EnableStamina && (Game1.player.Stamina <= staminaThreshold)) 
-                || (Config.EnableHealth && (Game1.player.health <= Config.HealthThreshold)));
+            var needEat = (!eatingFood && !Game1.player.isEating) && (eatType == 1 || eatType == 2);
             if (needEat) //if the player has run out of Energy, then:
             {
                 if (!goodPreviousFrame) //makes it so that they have to be "good" (doing nothing, not in a menu) two frames in a row in order for this to pass - necessary thanks to Lost Book bug (tl;dr - wait a frame before continuing)
@@ -219,7 +232,7 @@ namespace AutoEat
                 {
                     this.Monitor.Log($"Auto-Eat: Stamina: {Game1.player.Stamina} <= {staminaThreshold}, Health: {Game1.player.health} <= {Config.HealthThreshold}, Eat: {cheapestFood.Name}");
                     eatingFood = true;
-                    EatFood(cheapestFood, "to avoid over-exertion");                }
+                    EatFood(cheapestFood, eatType);                }
                 else if (Game1.player.stamina <= 0.0f) //however, if no food was found and the player's stamina is at 0, then [shoutouts to RobertLSnead again for pointing out some flawed code here]
                     trueOverexertion = true; //the player will be over-exerted for the rest of the day, just like they normally would be. I made it this way intentionally, in order to keep this mod balanced!
             }
@@ -237,9 +250,16 @@ namespace AutoEat
             }
         }
 
-        private void EatFood(Item food, string reason)
+        private void EatFood(Item food, int eatType)
         {
-            Game1.showGlobalMessage($"You consume {food.Name} {reason}."); //makes a message to inform the player of the reason they just stopped what they were doing to be forced to eat a food, lol.
+            string msg = eatType switch
+            {
+                1 => Helper.Translation.Get("EatMessageStamina").ToString(),
+                2 => Helper.Translation.Get("EatMessageHealth").ToString(),
+                _ => Helper.Translation.Get("EatMessageBuff").ToString(),
+            };
+            this.Monitor.Log(msg);
+            Game1.showGlobalMessage(msg.Replace("{FOOD}", food.DisplayName)); //makes a message to inform the player of the reason they just stopped what they were doing to be forced to eat a food, lol.
             var direction = Game1.player.FacingDirection;
             var toolIndex = Game1.player.CurrentToolIndex;
             if (Game1.player.CurrentTool is FishingRod tool && tool.inUse())
@@ -280,7 +300,7 @@ namespace AutoEat
             {
                 return "";
             }
-            EatFood(coffee, $"for buff");
+            EatFood(coffee, 3);
             return coffee.Name;
         }
 
@@ -339,7 +359,7 @@ namespace AutoEat
                 {
                     continue;
                 }
-                EatFood(food, $"for buff");
+                EatFood(food, 3);
                 lastEatTime[food.Name] = now;
                 return;
             }

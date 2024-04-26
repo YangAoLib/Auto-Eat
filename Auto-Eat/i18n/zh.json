@@ -1,0 +1,21 @@
+﻿{
+  "EnableStamina.name": "为能量启用",
+  "EnableStamina.tooltip": "为能量启用自动饮食。",
+  "StaminaThreshold.name": "能量阈值",
+  "StaminaThreshold.tooltip": "自动饮食的能量阈值。",
+  "DynamicStaminaThreshold.name": "动态能量阈值",
+  "DynamicStaminaThreshold.tooltip": "根据当前使用的工具消耗的能量动态调整能量阈值。",
+  "EnableHealth.name": "为生命值启用",
+  "EnableHealth.tooltip": "为精力启用自动饮食。",
+  "HealthThreshold.name": "生命值阈值",
+  "HealthThreshold.tooltip": "自动饮食的生命值阈值。",
+  "PreferHigherInventory.name": "优先食用高库存食物",
+  "PreferHigherInventory.tooltip": "当多个食物性价比（售价/能量）相同时，优先食用高库存食物。",
+  "EnableCoffee.name": "自动喝咖啡",
+  "EnableCoffee.tooltip": "当增益效果消失时自动喝咖啡或者三倍浓缩咖啡",
+  "CustomFoods.name": "自动食用指定食物",
+  "CustomFoods.tooltip": "当增益效果消失时自动食用指定食物, 食物（英文）名称用逗号分割。",
+  "EatMessageStamina": "你消耗 {FOOD} 防止能量过低。",
+  "EatMessageHealth": "你消耗 {FOOD} 防止生命值过低。",
+  "EatMessageBuff": "你消耗 {FOOD} 为了获得增益效果。"
+}

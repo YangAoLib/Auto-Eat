@@ -1,0 +1,21 @@
+﻿{
+  "EnableStamina.name": "Enable for stamina",
+  "EnableStamina.tooltip": "Enable automatically consume food for stamina.",
+  "StaminaThreshold.name": "Stamina threshold",
+  "StaminaThreshold.tooltip": "Stamina threshold at which the player will automatically consume food.",
+  "DynamicStaminaThreshold.name": "Dynamic stamina threshold",
+  "DynamicStaminaThreshold.tooltip": "Use dynamic stamina threshold depending on current tool costs.",
+  "EnableHealth.name": "Enable for health",
+  "EnableHealth.tooltip": "Enable automatically consume food for health.",
+  "HealthThreshold.name": "Health threshold",
+  "HealthThreshold.tooltip": "Health threshold at which the player will automatically consume food.",
+  "PreferHigherInventory.name": "Prefer higher inventory food",
+  "PreferHigherInventory.tooltip": "Among equally cheap (salePrice / Energy) foods, prefer foods with higher inventory.",
+  "EnableCoffee.name": "Auto drink coffee",
+  "EnableCoffee.tooltip": "Auto drink coffee or Triple Shot Espresso when the buff is gone.",
+  "CustomFoods.name": "Auto eat custom foods",
+  "CustomFoods.tooltip": "Auto eat custom foods when the buff is gone, food names are separated by commas.",
+  "EatMessageStamina": "You consume {FOOD} to avoid low stamina.",
+  "EatMessageHealth": "You consume {FOOD} to avoid low health.",
+  "EatMessageBuff": "You consume {FOOD} for buff."
+}
