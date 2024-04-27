@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using GenericModConfigMenu;
-using Microsoft.VisualBasic;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Tools;
+
 
 namespace AutoEat
 {
@@ -23,6 +22,7 @@ namespace AutoEat
         private static bool goodPreviousFrame = false; //used to prevent loss of food when falling to 0 Stamina on the same frame that you receive a Lost Book or something similar, in that order.
         private static bool eatingFood = false; //just a boolean used to make it so that code doesn't run more than once.
         private static Dictionary<string, long> lastEatTime = new Dictionary<string, long>();
+        private static bool autoEatForBuff = true; 
 
         public static bool firstCall = false; //used in clearOldestHUDMessage()
         public static ModConfig Config;
@@ -40,6 +40,7 @@ namespace AutoEat
             helper.Events.GameLoop.Saving += this.OnSaving;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
+            helper.Events.Input.ButtonsChanged += OnButtonsChanged;
         }
 
         public static void ClearOldestHUDMessage() //I may have stolen this idea from CJBok (props to them)
@@ -76,7 +77,10 @@ namespace AutoEat
                 save: () => { ResetStateVars(); this.Helper.WriteConfig(Config);}
             );
 
-            // add some config options
+            configMenu.AddSectionTitle(
+                mod: this.ModManifest,
+                text: () => Helper.Translation.Get("AutoEat.text")
+            ); 
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
                 name: () => Helper.Translation.Get("EnableStamina.name"),
@@ -118,6 +122,16 @@ namespace AutoEat
                 tooltip: () => Helper.Translation.Get("PreferHigherInventory.tooltip"),
                 getValue: () => Config.PreferHigherInventory,
                 setValue: value => Config.PreferHigherInventory = value
+            );
+            configMenu.AddSectionTitle(
+                mod: this.ModManifest,
+                text: () => Helper.Translation.Get("AutoEatForBuff.text")
+            ); 
+            configMenu.AddKeybindList(
+                ModManifest,
+                name: () => Helper.Translation.Get("ToggleAutoBuffKey.name"),
+                getValue: () => Config.ToggleAutoBuffKey,
+                setValue: value => Config.ToggleAutoBuffKey = value
             );
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
@@ -306,6 +320,10 @@ namespace AutoEat
 
         private void EatForBuff(object sender, UpdateTickedEventArgs e)
         {
+            if (!autoEatForBuff)
+            {
+                return;
+            }
             if (Config._customFoods.Count == 0 && !Config.EnableCoffee)
             {
                 return;
@@ -400,6 +418,21 @@ namespace AutoEat
             trueOverexertion = false; //reset the variable, allowing the UpdateTick method checks to occur once more (in other words, allowing the player to avoid over-exertion once more)
             eatingFood = false; //reset the variable (this one isn't necessary as far as I know, but who knows? maybe a person will run out of stamina right as they hit 2:00 am in-game.)
             lastEatTime.Clear();
+        }
+        private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
+        {
+            if (Context.IsPlayerFree && Config.ToggleAutoBuffKey.JustPressed())
+            {
+                autoEatForBuff = !autoEatForBuff;
+                if (autoEatForBuff)
+                {
+                    Game1.showGlobalMessage(Helper.Translation.Get("MessageAutoBuffOn"));
+                }
+                else
+                {
+                    Game1.showGlobalMessage(Helper.Translation.Get("MessageAutoBuffOff"));
+                }
+            }
         }
     }
 }

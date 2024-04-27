@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 
 namespace AutoEat
 {
@@ -12,6 +13,7 @@ namespace AutoEat
         public bool DynamicStaminaThreshold { get; set; } = false;
         public bool PreferHigherInventory { get; set; } = true;
         public bool EnableCoffee { get; set; } = false;
+        public KeybindList ToggleAutoBuffKey { get; set; } = KeybindList.Parse("Home");
         public List<string> _customFoods = new List<string>();
         public string CustomFoods
         {

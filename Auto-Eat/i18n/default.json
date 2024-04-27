@@ -17,5 +17,10 @@
   "CustomFoods.tooltip": "Auto eat custom foods when the buff is gone, food names are separated by commas.",
   "EatMessageStamina": "You consume {FOOD} to avoid low stamina.",
   "EatMessageHealth": "You consume {FOOD} to avoid low health.",
-  "EatMessageBuff": "You consume {FOOD} for buff."
+  "EatMessageBuff": "You consume {FOOD} for buff.",
+  "AutoEatForBuff.text": "Auto eat for buff",
+  "AutoEat.text": "Auto eat",
+  "MessageAutoBuffOn": "You turn on auto eat for buff.",
+  "MessageAutoBuffOff": "You turn off auto eat for buff.",
+  "ToggleAutoBuffKey.name": "Auto eat for buff key map"
 }

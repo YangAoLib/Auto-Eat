@@ -17,5 +17,10 @@
   "CustomFoods.tooltip": "当增益效果消失时自动食用指定食物, 食物（英文）名称用逗号分割。",
   "EatMessageStamina": "你消耗 {FOOD} 防止能量过低。",
   "EatMessageHealth": "你消耗 {FOOD} 防止生命值过低。",
-  "EatMessageBuff": "你消耗 {FOOD} 为了获得增益效果。"
+  "EatMessageBuff": "你消耗 {FOOD} 为了获得增益效果。",
+  "AutoEatForBuff.text": "自动增益",
+  "AutoEat.text": "自动饮食",
+  "MessageAutoBuffOn": "你开启了自动增益。",
+  "MessageAutoBuffOff": "你关闭了自动增益。",
+  "ToggleAutoBuffKey.name": "切换自动增益快捷键"
 }
