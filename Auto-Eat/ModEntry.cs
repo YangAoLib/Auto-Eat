@@ -123,6 +123,13 @@ namespace AutoEat
                 getValue: () => Config.PreferHigherInventory,
                 setValue: value => Config.PreferHigherInventory = value
             );
+            configMenu.AddTextOption(
+                mod: this.ModManifest,
+                name: () => Helper.Translation.Get("ExcludedFoods.name"),
+                tooltip: () => Helper.Translation.Get("ExcludedFoods.tooltip"),
+                getValue: () => Config.ExcludedFoods,
+                setValue: value => Config.ExcludedFoods = value
+            );
             configMenu.AddSectionTitle(
                 mod: this.ModManifest,
                 text: () => Helper.Translation.Get("AutoEatForBuff.text")
@@ -272,7 +279,6 @@ namespace AutoEat
                 2 => Helper.Translation.Get("EatMessageHealth").ToString(),
                 _ => Helper.Translation.Get("EatMessageBuff").ToString(),
             };
-            this.Monitor.Log(msg);
             Game1.showGlobalMessage(msg.Replace("{FOOD}", food.DisplayName)); //makes a message to inform the player of the reason they just stopped what they were doing to be forced to eat a food, lol.
             var direction = Game1.player.FacingDirection;
             var toolIndex = Game1.player.CurrentToolIndex;
@@ -387,7 +393,8 @@ namespace AutoEat
         //will return null if no item found; shoutouts to RobertLSnead
         private Item GetCheapestFood()
         {
-            var foods = Game1.player.Items.Where(curItem => (curItem is StardewValley.Object && ((StardewValley.Object)curItem).Edibility > 0)).ToList();
+            var foods = Game1.player.Items.Where(
+                curItem => (curItem is StardewValley.Object item && item.Edibility > 0 && !Config.ExcludedFoods.Contains(item.Name))).ToList();
             if (foods.Count == 0)
             {
                 return null;

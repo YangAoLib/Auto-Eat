@@ -1,4 +1,5 @@
 ﻿{
+  "AutoEat.text": "Auto eat",
   "EnableStamina.name": "Enable for stamina",
   "EnableStamina.tooltip": "Enable automatically consume food for stamina.",
   "StaminaThreshold.name": "Stamina threshold",
@@ -11,6 +12,10 @@
   "HealthThreshold.tooltip": "Health threshold at which the player will automatically consume food.",
   "PreferHigherInventory.name": "Prefer higher inventory food",
   "PreferHigherInventory.tooltip": "Among equally cheap (salePrice / Energy) foods, prefer foods with higher inventory.",
+  "ExcludedFoods.name": "Excluded Foods",
+  "ExcludedFoods.tooltip": "Foods to exclude from auto eat, food names are separated by commas.",
+  "AutoEatForBuff.text": "Auto eat for buff",
+  "ToggleAutoBuffKey.name": "Auto eat for buff key map",
   "EnableCoffee.name": "Auto drink coffee",
   "EnableCoffee.tooltip": "Auto drink coffee or Triple Shot Espresso when the buff is gone.",
   "CustomFoods.name": "Auto eat custom foods",
@@ -18,9 +23,6 @@
   "EatMessageStamina": "You consume {FOOD} to avoid low stamina.",
   "EatMessageHealth": "You consume {FOOD} to avoid low health.",
   "EatMessageBuff": "You consume {FOOD} for buff.",
-  "AutoEatForBuff.text": "Auto eat for buff",
-  "AutoEat.text": "Auto eat",
   "MessageAutoBuffOn": "You turn on auto eat for buff.",
-  "MessageAutoBuffOff": "You turn off auto eat for buff.",
-  "ToggleAutoBuffKey.name": "Auto eat for buff key map"
+  "MessageAutoBuffOff": "You turn off auto eat for buff."
 }

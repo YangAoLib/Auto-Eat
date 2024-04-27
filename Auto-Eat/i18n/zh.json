@@ -1,4 +1,5 @@
 ﻿{
+  "AutoEat.text": "自动饮食",
   "EnableStamina.name": "为能量启用",
   "EnableStamina.tooltip": "为能量启用自动饮食。",
   "StaminaThreshold.name": "能量阈值",
@@ -11,6 +12,10 @@
   "HealthThreshold.tooltip": "自动饮食的生命值阈值。",
   "PreferHigherInventory.name": "优先食用高库存食物",
   "PreferHigherInventory.tooltip": "当多个食物性价比（售价/能量）相同时，优先食用高库存食物。",
+  "ExcludedFoods.name": "排除的食物",
+  "ExcludedFoods.tooltip": "从自动饮食中排除的食物, 食物（英文）名称用逗号分割。",
+  "AutoEatForBuff.text": "自动增益",
+  "ToggleAutoBuffKey.name": "切换自动增益快捷键",
   "EnableCoffee.name": "自动喝咖啡",
   "EnableCoffee.tooltip": "当增益效果消失时自动喝咖啡或者三倍浓缩咖啡",
   "CustomFoods.name": "自动食用指定食物",
@@ -18,9 +23,6 @@
   "EatMessageStamina": "你消耗 {FOOD} 防止能量过低。",
   "EatMessageHealth": "你消耗 {FOOD} 防止生命值过低。",
   "EatMessageBuff": "你消耗 {FOOD} 为了获得增益效果。",
-  "AutoEatForBuff.text": "自动增益",
-  "AutoEat.text": "自动饮食",
   "MessageAutoBuffOn": "你开启了自动增益。",
-  "MessageAutoBuffOff": "你关闭了自动增益。",
-  "ToggleAutoBuffKey.name": "切换自动增益快捷键"
+  "MessageAutoBuffOff": "你关闭了自动增益。"
 }
