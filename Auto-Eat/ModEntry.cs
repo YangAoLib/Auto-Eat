@@ -36,6 +36,7 @@ namespace AutoEat
         {
             Config = helper.ReadConfig<ModConfig>();
             helper.ConsoleCommands.Add("player_setstaminathreshold", "Sets the threshold at which the player will automatically consume food.\nUsage: player_setstaminathreshold <value>\n- value: the float/integer amount.", this.SetStaminaThreshold); //command that sets when to automatically eat (i.e. 25 energy instead of 0)
+            helper.ConsoleCommands.Add("player_sethealththreshold", "Sets the threshold at which the player will automatically consume food for health.\nUsage: player_sethealththreshold <value>\n- value: the float/integer amount.", this.SetHealthThreshold);
             helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked; //adding the method with the same name below to the corresponding event in order to make them connect
             helper.Events.GameLoop.Saving += this.OnSaving;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
@@ -167,6 +168,19 @@ namespace AutoEat
             this.Helper.WriteConfig(Config);
 
             this.Monitor.Log($"OK, set the stamina threshold to {newValue}.");
+        }
+
+        private void SetHealthThreshold(string command, string[] args)
+        {
+            float newValue = (float)double.Parse(args[0]);
+
+            if (newValue < 0.0f || newValue >= Game1.player.maxHealth) //不允许血量阈值超出可能的范围
+                newValue = 0.0f;
+
+            Config.HealthThreshold = newValue;
+            this.Helper.WriteConfig(Config);
+
+            this.Monitor.Log($"OK, set the health threshold to {newValue}.");
         }
 
         private float GetDynamicStaminaThreshold()
